@@ -1,16 +1,19 @@
-app.factory('myCoordinates', ['$q', '$http', function myCoordinates($q, $http) {
+app.factory('myCoordinates', ['$q', function myCoordinates($q) {
 
 	var deferred = $q.defer();
 
-	$http.get('http://ip-api.com/json')
-		.success(function(coordinates) {
-			var myCoordinates = {};
-			myCoordinates.lat = coordinates.lat;
-			myCoordinates.lng = coordinates.lon;
-			myCoordinates.zoom = 14;
-			myCoordinates.city = coordinates.city;
-			deferred.resolve(myCoordinates);
-	})
+	if (window.navigator && window.navigator.geolocation) {
+		window.navigator.geolocation.getCurrentPosition(getCoordinates);
+	} else {
+		deferred.reject({msg: "Browser does not supports HTML5 geolocation"});
+	}
+
+	function getCoordinates(coordinates){
+		var myCoordinates = {};
+		myCoordinates.lat = coordinates.coords.latitude;
+		myCoordinates.lng = coordinates.coords.longitude;
+		deferred.resolve(myCoordinates);
+	}
 
 	return deferred.promise;
 
