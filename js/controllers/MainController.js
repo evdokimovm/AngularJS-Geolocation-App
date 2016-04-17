@@ -11,14 +11,19 @@ app.controller('MainController', ['$scope', '$http', 'coordinates', 'myCoordinat
 			return data;
 		})
 
+	$http.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + coordinates.lat + '%2C' + coordinates.lng + '&language=en')
+		.success(function(data){
+			$scope.city = data.results[0].address_components[2].long_name;
+			$scope.address = data.results[0].formatted_address;
+		})
+
 	getSightsPoints.success(function(data){
 		$scope.geodata = data;
 		var currentPositionPoint = {
 			lat: coordinates.lat,
 			lng: coordinates.lng,
-			city: coordinates.city,
 			focus: true,
-			message:'Your approximate location in ' + coordinates.city + ' is lat: ' + coordinates.lat + ' and lon: ' + coordinates.lng + '. You can also see some of the sights within a radius of 10 kilometers.',
+			message: 'Your approximate location in ' + $scope.city + ' is lat: ' + coordinates.lat + ' and lon: ' + coordinates.lng + ' (' + $scope.address + ')' + '. You can also see some of the sights within a radius of 10 kilometers.',
 			icon: {
 				type: 'awesomeMarker',
 				icon: 'user',
